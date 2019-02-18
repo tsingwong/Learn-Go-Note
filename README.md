@@ -213,3 +213,37 @@ func main() {
 }
 ```
 
+7. `swtich` 同样支持初始化语句，按从上到下，从左到右顺序匹配 `case` 语句，只有全部不匹配才会执行 `default` 块。相邻的 `case` 语句不构成多条件匹配，不可以出现重复的 `case` 常量；无需要显示执行 `break` 语句，`case` 完毕后自动中断。如果需要连贯后面的 case 语句，需要执行 `fallthrough` 语句，但是不会匹配后续条件表达式。注：`fallthrough` 语句会被 `break` 语句阻止，所以要放在 `case` 块的结尾。
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	switch x := 5; x {
+	case 5:
+		x += 10
+		fmt.Println(x)
+
+		// if x >= 15 {
+		// 	break 
+		// }
+
+		fallthrough
+	case 6:
+		x += 20
+		fmt.Println(x) // 35
+	case 7:
+		x += 20
+		fmt.Println(x) // 这个不会输出哦
+	}
+}
+```
+
+8. 
+
+```go
+
+```
+
