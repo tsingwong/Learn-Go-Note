@@ -241,9 +241,267 @@ func main() {
 }
 ```
 
-8. 
+8.  `for` 循环只有一种形式。初始化语句仅会被执行一次。注意初始化语句定义变量是局部变量。
 
 ```go
+package main
 
+func main() {
+	for index := 0; index < count; index++ {
+		// 初始化表达式支持函数调用或定义局部变量
+	}
+
+	for x < 10 {
+		// 类似 "while x < 10" 或 "for ; x < 10; {}"
+	}
+
+	for {
+		break
+	}
+}
 ```
+
+9. `for...range` 完成数据迭代，支持字符串、数组、数组指针、切片、字典、通道类型，返回索引、键值数据，允许返回单值，或者用 `_` 来忽略前者。
+
+| 数据类型    | 1st value | 2st value | 备注          |
+| ----------- | --------- | --------- | ------------- |
+| string      | index     | s[index]  | unicode, rune |
+| array/slice | index     | v[index]  |               |
+| map         | key       | value     |               |
+| channel     | element   |           |               |
+
+10. 不管是普通的 `for` 循环还是 `for......range` 迭代，其定义的局部变量都会重复使用。
+11. 使用 `goto` 前，必须先定义标签。标签区分大小写，且未使用的标签会引发编译错误。`goto` 不能用于跳转到其他函数，或者内部代码块内。
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func test() {
+test:
+	println("test")
+	fmt.Println("test Exit.")
+}
+
+func main() {
+	for index := 0; index < 3; index++ {
+	loop:
+		print(index)
+	}
+
+	goto test // label test not defined
+	goto loop // goto loop jumps into block starting at src/test/main.go:14:37
+}
+```
+
+12. 与 `goto`  定点跳转不同，break、continue 用于中断代码块执行，他们配合标签使用可以实现多层嵌套中指定目标层级。
+
+- `break`：用于 `switch`、`for`、`select` 语句，终止整个语句执行；
+- `continue`：仅用于 `for` 循环，终止后续逻辑，进入下一次循环。
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+outer:
+	for x := 0; x < 5; x++ {
+		for y := 0; y < 10; y++ {
+			if y > 2 {
+				println()
+				continue outer
+			}
+			if x > 2 {
+				break outer
+			}
+
+			fmt.Println(x, y)
+            // 0 0 0 1 0 2
+            // 1 0 1 1 1 2
+            // 2 0 2 1 2 2
+		}
+	}
+}
+```
+
+### 第四章 函数
+
+1. 函数是结构化编程的最小模块单元，函数是代码复用和测试基本单位。使用关键词 `func` 来定义。有以下优点：
+
+- 无需前置声明；
+- 不支持命名嵌套定义（nested）// 即函数里面不能在定义函数
+- 不支持同名函数重载（overload）
+- 不支持默认参数
+- 支持不定长变参
+- 支持多返回值
+- 支持命名返回值
+- 支持匿名函数和闭包
+
+2. 函数属于第一类对象（可以在运行期间创建，可以用作函数的参数或返回值，可以存入变量的实体。常见的是匿名函数），具有相同签名（参数及返回值列表）的视为同一类型。从阅读和代码维护角度来说，使用命名类型更加方便。函数只能判断其是否等于 `nil`，不支持其他比较。
+
+3. 从函数中返回局部变量指针是安全的，编译器会通过 **逃逸分析** 来决定是否在堆上分配内存。
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func test() *int {
+	a := 100
+	return &a
+}
+
+func main() {
+	var a *int = test()
+	fmt.Println(a, *a)
+}
+```
+
+4. 函数命名规范，在避免冲突的情况下，尽可能的本着精简短小、望文知意的原则，（函数与方法命名规则有所不同，方法通过选择符调用，具备状态上下文，可使用更加简短的动词命名）：
+
+- 动词 + 介词 + 名词， 如 scanWords
+- 避免不必要的缩写，如 printError 比 printErr 更好一些
+- 避免使用类型关键词，如 buildUserStruct 看上去很别扭
+- 避免歧义，不能有多重用途的解释容易造成误解
+- 避免只能通过大小写区分的同名函数
+- 避免使用数字，除非是特定专有名词，例如 UTF-8
+- 避免添加作用域提示前缀
+- 统一使用  camel/pascal case 拼写风格
+- 使用相同的术语，保持统一性
+- 使用习惯语法，比如 init 表示初始化， is/has 返回布尔值结果
+- 使用反义词组命名行为相反的函数，如 get/set，min/max 等
+
+5. 对于参数，Go 语言不支持有默认值的可选参数，不支持命名实参。调用时，必须按照签名顺序传递指定类型和数量的实参，就算是 `_` 命名的参数也不能省略。参数列表中，相邻的同类型参数可以合并。参数可是为函数局部变量，因此不能在相同层级定义同名变量。（形参是函数定义中的参数，实参是函数调用是传入的参数。形参类似函数局部变量，而实参是函数外部对象，可以是常量、变量、表达式或函数等）
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func test(x, y int, s string, _ bool) *int {
+	x := 100 // no new variables on left side of :=
+	y := 25
+	var s string // s redeclared in this block
+	z := x + y
+	return &z
+}
+
+func main() {
+	test(1, 2, 'tsingwong') // not enough arguments in call to test
+}
+```
+
+6. 函数中不管是指针、引用类型，还是其他类型参数，都是**值拷贝传递**（pass-by-value），函数调用之前，会为形参和返回值分配内存空间，并将实参拷贝到形参内存。
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func test(x *int) {
+	fmt.Printf("pointer: %p, target: %v\n", &x, x)
+    // pointer: 0xc000082028, target: 0xc00006c008
+}
+
+func main() {
+	a := 0x100
+	p := &a
+	fmt.Printf("pointer: %p, target: %v\n", &p, p)
+	// pointer: 0xc000082018, target: 0xc00006c008    
+	test(p)
+}
+```
+
+7. 要实现传出参数，通常建议使用返回值，当然也可以使用二级指针。参数过多时，通常建议将其重构成一个复合结构类型，也算是变相实现可选参数和命名实参功能。
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"time"
+)
+
+type serverOption struct {
+	address string
+	port    int
+	path    string
+	timeout time.Duration
+	log     *log.Logger
+}
+
+func newOption() *serverOption {
+	return &serverOption{
+		address: "0.0.0.0",
+		port:    8080,
+		path:    "/var/test",
+		timeout: time.Second * 5,
+		log:     nil,
+	}
+}
+
+func server(option *serverOption) {
+	fmt.Println(option.port)
+}
+
+func test(p **int) {
+	x := 100
+	*p = &x
+}
+
+func main() {
+	var p *int
+	test(&p)
+	fmt.Printf("%v \n", *p) // 100
+
+	opt := newOption()
+	opt.port = 8085
+	server(opt) // 8085
+}
+```
+
+8. 变参实质上是切片，只能接收一到多个同类型参数，且必须放在列表尾部。将切片作为变参时，必须进行展开操作。如果是数组，需要先将其转为切片。变参复制的仅仅是切片自身，不包括底层数组，因此可以修改原始数据。如果需要的话，可以使用内置函数 `copy` 复制底层数据。
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func test(s string, a ...int) {
+	fmt.Printf("%T, %v\n", a, a) // 显示类型和值 []int
+}
+
+func test2(a ...int) {
+	for i := range a {
+		a[i] += 100
+	}
+}
+
+func main() {
+	test("tsingwong", 1, 2, 3, 4, 5, 6)
+	a := [3]int{100, 200, 300}
+	test("tsingwong", a[:]...) // 展开 slice
+	// var a2 []int
+	var a2 []int = make([]int, 3)
+	copy(a2, []int{1, 2, 3})
+	test2(a[:]...)
+	fmt.Println(a)  // [200, 300, 400]
+	fmt.Println(a2) // [1, 2, 3]
+}
+```
+
+
 
