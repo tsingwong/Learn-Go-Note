@@ -495,13 +495,276 @@ func main() {
 	a := [3]int{100, 200, 300}
 	test("tsingwong", a[:]...) // 展开 slice
 	// var a2 []int
-	var a2 []int = make([]int, 3)
-	copy(a2, []int{1, 2, 3})
-	test2(a[:]...)
-	fmt.Println(a)  // [200, 300, 400]
-	fmt.Println(a2) // [1, 2, 3]
+	var a2 = a[:]
+	a3 := make([]int, 3)
+	// 复制了一个新的
+	copy(a3, []int{4, 5, 6})
+	test2(a2...)
+	test2(a3...)
+	fmt.Printf("%v, %p\n", a, &a)  // [200, 300, 400], 0xc000018200
+	fmt.Printf("%v, %p\n", a2, a2) // [200, 300, 400], 0xc000018200
+	fmt.Printf("%v, %p\n", a3, a3) // [104, 105, 106], 0xc000018220
 }
 ```
 
+9. 有返回值的函数，必须有明确的 `return` 终止语句，除非有 `panic` ，或无 `break` 的死循环，可以不添加 `return` 终止语句。借鉴自动态语言的多返回值模式，函数得以返回更多状态，尤其是 `error` 模式。（注：多返回值列表必须使用括号）可以用 `_` 忽略掉不想返回的值。
 
+```go
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+func div(x, y int) (int, error) {
+	if y == 0 {
+		return 0, errors.New("division by zero")
+	}
+	return x / y, nil
+}
+
+func log(x int, err error) {
+	fmt.Println(x, err)
+}
+
+func test() (int, error) {
+	return div(5, 0)
+}
+
+func main() {
+	log(test()) // 0 division by zero
+}
+```
+
+10. 对于返回值命名和简短变量定义一样，优缺点共存。命名返回值可以使函数声明更加清晰，同时也会改善帮助文档和代码编辑提示。命名返回值和参数一样，可当做函数局部变量使用，最后由 `return` 隐式返回。如果返回值类型能明确表示其含义的话，就尽量不要对其命名。
+
+```go
+func div(x, y int) (z int, err error) {
+	if y == 0 {
+		err = errors.New("division by zero")
+		return
+	}
+	z = x / y
+	return
+}
+```
+
+11. 匿名函数是指没有定义名字符号的函数。除了没有名字外，匿名函数和普通函数完全相同。最大区别在于，我们可以在函数内部定义匿名函数，形成类似嵌套的效果。且匿名函数可以直接调用，保存到变量，作为参数或返回值。
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func test(f func()) {
+	f()
+}
+
+func test2() func(int, int) int {
+	return func(x, y int) int {
+		return x * y
+	}
+}
+
+func main() {
+	// 匿名函数直接执行
+	func(s string) {
+		fmt.Println(s)
+	}("tsingwong")
+
+	// 匿名函数赋值给变量
+	add := func(a, b int) {
+		fmt.Println(a + b)
+	}
+	add(3, 4)
+
+	// 匿名函数作为参数
+	test(func() {
+		subtraction := func(x, y int) int {
+			return x - y
+		}
+		fmt.Println(subtraction(3, 4))
+	})
+
+    fmt.Println(test2()(2,3))
+}
+```
+
+12. 普通函数和匿名函数都可以作为结构体字段，或经通道传递。需要注意的是不曾使用的匿名函数会被编译当做是错误。
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func testStruct() {
+	type calc struct {
+		mul func(x, y int) int
+	}
+
+	x := calc{
+		mul: func(x, y int) int {
+			return x * y
+		},
+	}
+	fmt.Println(x.mul(2, 3))
+}
+
+func testChannel() {
+	c := make(chan func(int, int) int, 2)
+
+	c <- func(x, y int) int {
+		return x + y
+	}
+	fmt.Println((<-c)(1, 2))
+}
+
+func main() {
+	testStruct()
+	testChannel()
+}
+```
+
+13. 匿名函数是常见的重构手段，可以将大函数分解成多个相对独立的匿名函数块，然后用相对简洁的调用完成逻辑流程，以实现框架和细节分离。匿名函数的作用域（不使用闭包的情况下）被隔离，不会引起外部污染，更灵活，没有定义顺序限制，必要的时候可以抽离，便于实现干净、清晰的代码层次。
+14. 闭包是在其词法上下文中引用了自由变量的函数，闭包是函数和引用环境的组合体。正因为闭包通过指针引用环境变量，那么可能会导致其生命周期延长，甚至会被分配到堆内存中。闭包还存在 **延迟求值** 的特性，类似 JavaScript 。可以每次都使用不同的环境变量或传参复制，让各自闭包环境不相同。
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func test(x int) func() {
+	fmt.Println(&x)
+
+	return func() {
+		fmt.Println(&x, x)
+	}
+}
+
+func test2() []func() {
+	var s []func()
+
+	for i := 0; i < 2; i++ {
+		s = append(s, func() {
+			fmt.Println(&i, i)
+		})
+	}
+	return s
+}
+
+func test3() []func() {
+	var s []func()
+
+	for i := 0; i < 2; i++ {
+		x := i
+		s = append(s, func() {
+			fmt.Println(&x, x)
+		})
+	}
+	return s
+}
+
+func main() {
+	f := test(123)
+	f()
+
+	fmt.Println()
+	for _, f := range test2() {
+		f() // 输出是一致的  0xc0000160a0 2
+	}
+	for _, f := range test3() {
+		f() // 输出结果是不同的
+		// 0xc00006c040 0
+		// 0xc00006c048 1
+	}
+}
+```
+
+15. 多个匿名函数同时引用一个环境变量，任何修改行为都会影响其他函数的取值，在并发模式下可能需要做同步处理。闭包让我们不用传递参数就可以读取或修改环境状态，当然也要为此付出额外的性能代价，对于性能要求较高的场合，需要谨慎使用。
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func test(x int) (func(), func()) {
+	return func() {
+			fmt.Println(x)
+			x += 10
+		}, func() {
+			fmt.Println(x)
+		}
+}
+
+func main() {
+	a, b := test(10)
+	a() // 10
+	b() // 20
+}
+```
+
+16. 语句 `defer` 可以给当前函数注册稍后执行的函数调用，被称作是 **延迟调用**。因为他们直到当前函数执行结束后才被调用，所以常用于资源释放、解除锁定，以及错误处理等操作。延迟调用注册的是调用，必须提供执行所需的参数，参数在注册的时候回被值传递缓存起来，如果状态敏感，可以使用指针或闭包。多个延迟注册按照 FILO（先进后出）的次序执行。
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	x, y := 1, 2
+	defer func(a int) {
+		fmt.Println("defer1 x, y =", a, y)
+	}(x)
+
+	defer func(b *int) {
+		fmt.Println("defer2 x, y =", x, *b)
+	}(&y)
+	x += 100
+	y += 200
+	fmt.Println(x, y)  // 101 202
+    // defer2 x, y = 101 202
+    // defer1 x, y = 1 202
+}
+```
+
+17. 切记，延迟调用是在函数结束时才会被执行（在 return 之前）。不合理的使用方式会浪费更多资源，甚至造成逻辑错误。性能要求高且压力大的算法，应该避免使用延迟调用。
+18. 官方推荐的标准做法是返回 `error` 状态。标准库将 `error` 定义成了接口类型，以便开发者实现自定义的错误类型。一般来说，`error` 总是最后一个返回参数。标准库中提供了相关创建函数，可方便地创建包含简单错误文本的 `error` 对象。一般来说，应该通过错误变量，而并非文本内容来区分错误类型。
+
+```go
+package main
+
+import (
+	"errors"
+	"fmt"
+	"log"
+)
+
+var errDivZero = errors.New("divison by zero")
+
+func div(x, y int) (int, error) {
+	if y == 0 {
+		return 0, errDivZero
+	}
+	return x / y, nil
+}
+
+func main() {
+	z, err := div(5, 0)
+	if err == errDivZero {
+		log.Fatalln(err)
+	}
+	fmt.Println(z)
+}
+```
 
