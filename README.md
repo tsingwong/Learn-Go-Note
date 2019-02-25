@@ -768,3 +768,80 @@ func main() {
 }
 ```
 
+19. 实际开发中，我们可能会遇到大量函数和方法返回 `error`，使得调用代码变得很难看，很多检查语句充斥在代码中，有以下解决方法：
+
+- 使用专门的检查函数处理错误逻辑，如记录日志，简化检查代码
+- 在不影响逻辑的情况下，使用 `defer` 延后处理错误状态（ `err` 退化赋值）
+- 在不中断逻辑的情况下，将错误作为内部状态保存，等最终“提交”时在处理。
+
+20. `panic/recover` 在使用方法上更加接近于 `try/catch` 结构化异常。它们是内置函数并非语句， `panic` 会立即中断当前函数流程，执行延迟调用。而在延迟调用函数中， `recover` 可以捕获并 返回 `panic` 提交的错误对象。连续调用多个 `panic`，仅有最后一个会被 `recover` 捕获。
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+)
+
+func test() {
+	defer fmt.Println("test.1")
+	defer fmt.Println("test.2")
+
+	panic("i am dead.")
+}
+func main() {
+	// defer func() {
+	// 	if err := recover(); err != nil {
+	// 		log.Fatalln(err)
+	// 	}
+	// }()
+
+	// fmt.Println("gogogo")
+	// panic("i am dead.")
+	// fmt.Println()
+
+	defer func() {
+		log.Println(recover())
+	}()
+
+	test()
+}
+```
+
+21. 在延迟函数中 `panic`，不会影响后续延迟调用的执行。而 `recover` 之后的 `panic` ，可被再次捕获到。注： `recover` 必须在延迟调用**函数**中执行才能正常工作。
+
+```go
+package main
+
+import "log"
+
+func catch() {
+	log.Println("catch: ", recover()) // 4
+}
+
+func main() {
+	defer catch()
+	defer log.Println("second defer :", recover())// 3
+	defer func() {
+		log.Println("third defer :", recover())
+		panic("i am dead again.")
+	}() // 2
+	defer recover()
+	defer func() {
+		log.Println("fivth defer :", recover())
+		panic("i am dead again.")
+	}() // 1
+
+	panic("i am dead.")
+    
+    //2019/02/25 17:22:39 fivth defer : i am dead.
+	//2019/02/25 17:22:39 third defer : i am dead again.
+	//2019/02/25 17:22:39 second defer : <nil>
+	//2019/02/25 17:22:39 catch:  i am dead again.
+}
+```
+
+23. **除非是不可恢复性、导致系统无法正常工作的错误，否则不建议使用 `panic`**，如文件系统没有操作权限，服务器端口被占用，数据库未启动等等情况。
+
+### 第五章 数据
