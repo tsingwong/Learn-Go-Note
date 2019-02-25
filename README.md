@@ -12,13 +12,13 @@
 package main
 
 func test(a, b int) {
-	defer println("dispose>>>")
+    defer println("dispose>>>")
 
-	println(a / b)
+    println(a / b)
 }
 
 func main() {
-	test(10, 0)
+    test(10, 0)
 }
 ```
 
@@ -33,24 +33,24 @@ package main
 import "fmt"
 
 type user struct {
-	name string
-	age  byte
+    name string
+    age  byte
 }
 
 func (u user) ToString() string {
-	return fmt.Sprintf("%+v", u)
+    return fmt.Sprintf("%+v", u)
 }
 
 type manage struct {
-	user
-	title string
+    user
+    title string
 }
 
 func main() {
-	var m manage
-	m.name = "tsingwong"
-	m.age = 29
-	fmt.Println(m.ToString())
+    var m manage
+    m.name = "tsingwong"
+    m.age = 29
+    fmt.Println(m.ToString())
 }
 ```
 
@@ -72,7 +72,7 @@ var a int
 var b, c int
 var d, e = 100, "tsingwong"
 var (
-	f, g int
+    f, g int
     h, i = 100, "tsingwong"
 )
 
@@ -89,7 +89,7 @@ h, i = 1, "tsingwong"
 
 ```go
 const(
-	a = iota 	// 0
+    a = iota 	// 0
     b		 	// 1
     c = 100		// 100
     d			// 100
@@ -151,7 +151,7 @@ continue	for			import	return		var
 *		^		*=		^=		<-		>		>=		{		}
 /		<<		/=		<<=		++		=		:=		,		;
 %		>>		%=		>>=		--		!		...		.		:
-		*^				&^=
+        *^				&^=
 ```
 
 3. 指针与内存地址不能混为一谈。内存地址是内存中每个字节单元的唯一编号，而指针是一个实体。指针会分配内存空间，相当于一个专门用来保存地址的整型变量。
@@ -174,21 +174,21 @@ package main
 import "fmt"
 
 type data struct {
-	x int
-	s string
+    x int
+    s string
 }
 
 func main() {
-	var a = data{1, "tsingwong"}
-	b := data{
-		1,
-		"abc",
-	}
+    var a = data{1, "tsingwong"}
+    b := data{
+        1,
+        "abc",
+    }
 
-	c := []int{
-		1, 2, 3,
-		4, 5}
-	fmt.Println(a, b, c)
+    c := []int{
+        1, 2, 3,
+        4, 5}
+    fmt.Println(a, b, c)
 }
 ```
 
@@ -200,16 +200,16 @@ package main
 import "fmt"
 
 func main() {
-	var m = map[string]string{
-		"name": "tsingwong",
-		"age":  "26",
-	}
+    var m = map[string]string{
+        "name": "tsingwong",
+        "age":  "26",
+    }
 
-	if ch, ok := m["name1"]; ok {
-		fmt.Println(ch)
-	} else {
-		fmt.Println("not find")
-	}
+    if ch, ok := m["name1"]; ok {
+        fmt.Println(ch)
+    } else {
+        fmt.Println("not find")
+    }
 }
 ```
 
@@ -221,23 +221,23 @@ package main
 import "fmt"
 
 func main() {
-	switch x := 5; x {
-	case 5:
-		x += 10
-		fmt.Println(x)
+    switch x := 5; x {
+    case 5:
+        x += 10
+        fmt.Println(x)
 
-		// if x >= 15 {
-		// 	break 
-		// }
+        // if x >= 15 {
+        // 	break 
+        // }
 
-		fallthrough
-	case 6:
-		x += 20
-		fmt.Println(x) // 35
-	case 7:
-		x += 20
-		fmt.Println(x) // 这个不会输出哦
-	}
+        fallthrough
+    case 6:
+        x += 20
+        fmt.Println(x) // 35
+    case 7:
+        x += 20
+        fmt.Println(x) // 这个不会输出哦
+    }
 }
 ```
 
@@ -247,17 +247,17 @@ func main() {
 package main
 
 func main() {
-	for index := 0; index < count; index++ {
-		// 初始化表达式支持函数调用或定义局部变量
-	}
+    for index := 0; index < count; index++ {
+        // 初始化表达式支持函数调用或定义局部变量
+    }
 
-	for x < 10 {
-		// 类似 "while x < 10" 或 "for ; x < 10; {}"
-	}
+    for x < 10 {
+        // 类似 "while x < 10" 或 "for ; x < 10; {}"
+    }
 
-	for {
-		break
-	}
+    for {
+        break
+    }
 }
 ```
 
@@ -277,23 +277,23 @@ func main() {
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 func test() {
 test:
-	println("test")
-	fmt.Println("test Exit.")
+    println("test")
+    fmt.Println("test Exit.")
 }
 
 func main() {
-	for index := 0; index < 3; index++ {
-	loop:
-		print(index)
-	}
+    for index := 0; index < 3; index++ {
+    loop:
+        print(index)
+    }
 
-	goto test // label test not defined
-	goto loop // goto loop jumps into block starting at src/test/main.go:14:37
+    goto test // label test not defined
+    goto loop // goto loop jumps into block starting at src/test/main.go:14:37
 }
 ```
 
@@ -309,22 +309,22 @@ import "fmt"
 
 func main() {
 outer:
-	for x := 0; x < 5; x++ {
-		for y := 0; y < 10; y++ {
-			if y > 2 {
-				println()
-				continue outer
-			}
-			if x > 2 {
-				break outer
-			}
+    for x := 0; x < 5; x++ {
+        for y := 0; y < 10; y++ {
+            if y > 2 {
+                println()
+                continue outer
+            }
+            if x > 2 {
+                break outer
+            }
 
-			fmt.Println(x, y)
+            fmt.Println(x, y)
             // 0 0 0 1 0 2
             // 1 0 1 1 1 2
             // 2 0 2 1 2 2
-		}
-	}
+        }
+    }
 }
 ```
 
@@ -349,17 +349,17 @@ outer:
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 func test() *int {
-	a := 100
-	return &a
+    a := 100
+    return &a
 }
 
 func main() {
-	var a *int = test()
-	fmt.Println(a, *a)
+    var a *int = test()
+    fmt.Println(a, *a)
 }
 ```
 
@@ -383,19 +383,19 @@ func main() {
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 func test(x, y int, s string, _ bool) *int {
-	x := 100 // no new variables on left side of :=
-	y := 25
-	var s string // s redeclared in this block
-	z := x + y
-	return &z
+    x := 100 // no new variables on left side of :=
+    y := 25
+    var s string // s redeclared in this block
+    z := x + y
+    return &z
 }
 
 func main() {
-	test(1, 2, 'tsingwong') // not enough arguments in call to test
+    test(1, 2, 'tsingwong') // not enough arguments in call to test
 }
 ```
 
@@ -405,20 +405,20 @@ func main() {
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 func test(x *int) {
-	fmt.Printf("pointer: %p, target: %v\n", &x, x)
+    fmt.Printf("pointer: %p, target: %v\n", &x, x)
     // pointer: 0xc000082028, target: 0xc00006c008
 }
 
 func main() {
-	a := 0x100
-	p := &a
-	fmt.Printf("pointer: %p, target: %v\n", &p, p)
-	// pointer: 0xc000082018, target: 0xc00006c008    
-	test(p)
+    a := 0x100
+    p := &a
+    fmt.Printf("pointer: %p, target: %v\n", &p, p)
+    // pointer: 0xc000082018, target: 0xc00006c008    
+    test(p)
 }
 ```
 
@@ -428,46 +428,46 @@ func main() {
 package main
 
 import (
-	"fmt"
-	"log"
-	"time"
+    "fmt"
+    "log"
+    "time"
 )
 
 type serverOption struct {
-	address string
-	port    int
-	path    string
-	timeout time.Duration
-	log     *log.Logger
+    address string
+    port    int
+    path    string
+    timeout time.Duration
+    log     *log.Logger
 }
 
 func newOption() *serverOption {
-	return &serverOption{
-		address: "0.0.0.0",
-		port:    8080,
-		path:    "/var/test",
-		timeout: time.Second * 5,
-		log:     nil,
-	}
+    return &serverOption{
+        address: "0.0.0.0",
+        port:    8080,
+        path:    "/var/test",
+        timeout: time.Second * 5,
+        log:     nil,
+    }
 }
 
 func server(option *serverOption) {
-	fmt.Println(option.port)
+    fmt.Println(option.port)
 }
 
 func test(p **int) {
-	x := 100
-	*p = &x
+    x := 100
+    *p = &x
 }
 
 func main() {
-	var p *int
-	test(&p)
-	fmt.Printf("%v \n", *p) // 100
+    var p *int
+    test(&p)
+    fmt.Printf("%v \n", *p) // 100
 
-	opt := newOption()
-	opt.port = 8085
-	server(opt) // 8085
+    opt := newOption()
+    opt.port = 8085
+    server(opt) // 8085
 }
 ```
 
@@ -477,33 +477,33 @@ func main() {
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 func test(s string, a ...int) {
-	fmt.Printf("%T, %v\n", a, a) // 显示类型和值 []int
+    fmt.Printf("%T, %v\n", a, a) // 显示类型和值 []int
 }
 
 func test2(a ...int) {
-	for i := range a {
-		a[i] += 100
-	}
+    for i := range a {
+        a[i] += 100
+    }
 }
 
 func main() {
-	test("tsingwong", 1, 2, 3, 4, 5, 6)
-	a := [3]int{100, 200, 300}
-	test("tsingwong", a[:]...) // 展开 slice
-	// var a2 []int
-	var a2 = a[:]
-	a3 := make([]int, 3)
-	// 复制了一个新的
-	copy(a3, []int{4, 5, 6})
-	test2(a2...)
-	test2(a3...)
-	fmt.Printf("%v, %p\n", a, &a)  // [200, 300, 400], 0xc000018200
-	fmt.Printf("%v, %p\n", a2, a2) // [200, 300, 400], 0xc000018200
-	fmt.Printf("%v, %p\n", a3, a3) // [104, 105, 106], 0xc000018220
+    test("tsingwong", 1, 2, 3, 4, 5, 6)
+    a := [3]int{100, 200, 300}
+    test("tsingwong", a[:]...) // 展开 slice
+    // var a2 []int
+    var a2 = a[:]
+    a3 := make([]int, 3)
+    // 复制了一个新的
+    copy(a3, []int{4, 5, 6})
+    test2(a2...)
+    test2(a3...)
+    fmt.Printf("%v, %p\n", a, &a)  // [200, 300, 400], 0xc000018200
+    fmt.Printf("%v, %p\n", a2, a2) // [200, 300, 400], 0xc000018200
+    fmt.Printf("%v, %p\n", a3, a3) // [104, 105, 106], 0xc000018220
 }
 ```
 
@@ -513,27 +513,27 @@ func main() {
 package main
 
 import (
-	"errors"
-	"fmt"
+    "errors"
+    "fmt"
 )
 
 func div(x, y int) (int, error) {
-	if y == 0 {
-		return 0, errors.New("division by zero")
-	}
-	return x / y, nil
+    if y == 0 {
+        return 0, errors.New("division by zero")
+    }
+    return x / y, nil
 }
 
 func log(x int, err error) {
-	fmt.Println(x, err)
+    fmt.Println(x, err)
 }
 
 func test() (int, error) {
-	return div(5, 0)
+    return div(5, 0)
 }
 
 func main() {
-	log(test()) // 0 division by zero
+    log(test()) // 0 division by zero
 }
 ```
 
@@ -541,12 +541,12 @@ func main() {
 
 ```go
 func div(x, y int) (z int, err error) {
-	if y == 0 {
-		err = errors.New("division by zero")
-		return
-	}
-	z = x / y
-	return
+    if y == 0 {
+        err = errors.New("division by zero")
+        return
+    }
+    z = x / y
+    return
 }
 ```
 
@@ -556,38 +556,38 @@ func div(x, y int) (z int, err error) {
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 func test(f func()) {
-	f()
+    f()
 }
 
 func test2() func(int, int) int {
-	return func(x, y int) int {
-		return x * y
-	}
+    return func(x, y int) int {
+        return x * y
+    }
 }
 
 func main() {
-	// 匿名函数直接执行
-	func(s string) {
-		fmt.Println(s)
-	}("tsingwong")
+    // 匿名函数直接执行
+    func(s string) {
+        fmt.Println(s)
+    }("tsingwong")
 
-	// 匿名函数赋值给变量
-	add := func(a, b int) {
-		fmt.Println(a + b)
-	}
-	add(3, 4)
+    // 匿名函数赋值给变量
+    add := func(a, b int) {
+        fmt.Println(a + b)
+    }
+    add(3, 4)
 
-	// 匿名函数作为参数
-	test(func() {
-		subtraction := func(x, y int) int {
-			return x - y
-		}
-		fmt.Println(subtraction(3, 4))
-	})
+    // 匿名函数作为参数
+    test(func() {
+        subtraction := func(x, y int) int {
+            return x - y
+        }
+        fmt.Println(subtraction(3, 4))
+    })
 
     fmt.Println(test2()(2,3))
 }
@@ -599,34 +599,34 @@ func main() {
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 func testStruct() {
-	type calc struct {
-		mul func(x, y int) int
-	}
+    type calc struct {
+        mul func(x, y int) int
+    }
 
-	x := calc{
-		mul: func(x, y int) int {
-			return x * y
-		},
-	}
-	fmt.Println(x.mul(2, 3))
+    x := calc{
+        mul: func(x, y int) int {
+            return x * y
+        },
+    }
+    fmt.Println(x.mul(2, 3))
 }
 
 func testChannel() {
-	c := make(chan func(int, int) int, 2)
+    c := make(chan func(int, int) int, 2)
 
-	c <- func(x, y int) int {
-		return x + y
-	}
-	fmt.Println((<-c)(1, 2))
+    c <- func(x, y int) int {
+        return x + y
+    }
+    fmt.Println((<-c)(1, 2))
 }
 
 func main() {
-	testStruct()
-	testChannel()
+    testStruct()
+    testChannel()
 }
 ```
 
@@ -637,53 +637,53 @@ func main() {
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 func test(x int) func() {
-	fmt.Println(&x)
+    fmt.Println(&x)
 
-	return func() {
-		fmt.Println(&x, x)
-	}
+    return func() {
+        fmt.Println(&x, x)
+    }
 }
 
 func test2() []func() {
-	var s []func()
+    var s []func()
 
-	for i := 0; i < 2; i++ {
-		s = append(s, func() {
-			fmt.Println(&i, i)
-		})
-	}
-	return s
+    for i := 0; i < 2; i++ {
+        s = append(s, func() {
+            fmt.Println(&i, i)
+        })
+    }
+    return s
 }
 
 func test3() []func() {
-	var s []func()
+    var s []func()
 
-	for i := 0; i < 2; i++ {
-		x := i
-		s = append(s, func() {
-			fmt.Println(&x, x)
-		})
-	}
-	return s
+    for i := 0; i < 2; i++ {
+        x := i
+        s = append(s, func() {
+            fmt.Println(&x, x)
+        })
+    }
+    return s
 }
 
 func main() {
-	f := test(123)
-	f()
+    f := test(123)
+    f()
 
-	fmt.Println()
-	for _, f := range test2() {
-		f() // 输出是一致的  0xc0000160a0 2
-	}
-	for _, f := range test3() {
-		f() // 输出结果是不同的
-		// 0xc00006c040 0
-		// 0xc00006c048 1
-	}
+    fmt.Println()
+    for _, f := range test2() {
+        f() // 输出是一致的  0xc0000160a0 2
+    }
+    for _, f := range test3() {
+        f() // 输出结果是不同的
+        // 0xc00006c040 0
+        // 0xc00006c048 1
+    }
 }
 ```
 
@@ -693,22 +693,22 @@ func main() {
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 func test(x int) (func(), func()) {
-	return func() {
-			fmt.Println(x)
-			x += 10
-		}, func() {
-			fmt.Println(x)
-		}
+    return func() {
+            fmt.Println(x)
+            x += 10
+        }, func() {
+            fmt.Println(x)
+        }
 }
 
 func main() {
-	a, b := test(10)
-	a() // 10
-	b() // 20
+    a, b := test(10)
+    a() // 10
+    b() // 20
 }
 ```
 
@@ -718,21 +718,21 @@ func main() {
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 func main() {
-	x, y := 1, 2
-	defer func(a int) {
-		fmt.Println("defer1 x, y =", a, y)
-	}(x)
+    x, y := 1, 2
+    defer func(a int) {
+        fmt.Println("defer1 x, y =", a, y)
+    }(x)
 
-	defer func(b *int) {
-		fmt.Println("defer2 x, y =", x, *b)
-	}(&y)
-	x += 100
-	y += 200
-	fmt.Println(x, y)  // 101 202
+    defer func(b *int) {
+        fmt.Println("defer2 x, y =", x, *b)
+    }(&y)
+    x += 100
+    y += 200
+    fmt.Println(x, y)  // 101 202
     // defer2 x, y = 101 202
     // defer1 x, y = 1 202
 }
@@ -745,26 +745,26 @@ func main() {
 package main
 
 import (
-	"errors"
-	"fmt"
-	"log"
+    "errors"
+    "fmt"
+    "log"
 )
 
 var errDivZero = errors.New("divison by zero")
 
 func div(x, y int) (int, error) {
-	if y == 0 {
-		return 0, errDivZero
-	}
-	return x / y, nil
+    if y == 0 {
+        return 0, errDivZero
+    }
+    return x / y, nil
 }
 
 func main() {
-	z, err := div(5, 0)
-	if err == errDivZero {
-		log.Fatalln(err)
-	}
-	fmt.Println(z)
+    z, err := div(5, 0)
+    if err == errDivZero {
+        log.Fatalln(err)
+    }
+    fmt.Println(z)
 }
 ```
 
